@@ -1,6 +1,6 @@
 ---
 name: Code Analysis
-desription: "Scans you code and gives you a report with CodeQL"
+description: "Scans you code and gives you a report with CodeQL"
 
 # Make the workfdlow re-usable
 on:

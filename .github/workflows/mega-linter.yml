@@ -1,6 +1,6 @@
 ---
 name: MegaLinter
-desription: "Lint you project and push fixes"
+description: "Lint you project and push fixes"
 
 # Make the workfdlow re-usable
 on:
