@@ -5,10 +5,6 @@ desription: "Scans you code and gives you a report with CodeQL"
 # Make the workfdlow re-usable
 on:
   workflow_call:
-    inputs:
-      languages:
-        description: "List of languages in your project. CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]"
-        required: true
 
 jobs:
 
@@ -24,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ${{ inputs.languages }}
+        language: ["java"] 
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # The steps will run for each language in the matrix
 
