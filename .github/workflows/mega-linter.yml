@@ -21,7 +21,7 @@ jobs:
 
     env:
       # Linter configurations (https://megalinter.github.io/latest/configuration/)
-      APPLY_FIXES: ${{ apply_fixes }}
+      APPLY_FIXES: ${{ inputs.apply_fixes }}
       APPLY_FIXES_EVENT: pull_request
       APPLY_FIXES_MODE: commit
 
