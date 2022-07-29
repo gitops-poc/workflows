@@ -1,8 +1,8 @@
 ---
 name: MegaLinter
-description: "Lint you project and push fixes"
 
-# Make the workfdlow re-usable
+
+# Make the workflow re-usable
 on:
   workflow_call:
     inputs:

@@ -1,8 +1,7 @@
 ---
 name: Code Analysis
-description: "Scans you code and gives you a report with CodeQL"
 
-# Make the workfdlow re-usable
+# Make the workflow re-usable
 on:
   workflow_call:
 
