@@ -13,18 +13,23 @@ on:
           Reference : https://github.com/docker/metadata-action#tags-input
         required: true
         type: string
-      trivy_upload_sarif:
-        description: "Upload result of Trivy scan to GitHub's security page"
-        default: true
+      trivy_version:
+        description: "Version of Trivy to use"
+        default: "0.30.4"
         required: false
-        type: boolean
-      trivy_treshold:
-        description: "Trivy scan treshold for failure (UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL)"
+        type: string
+      trivy_threshold:
+        description: "Trivy scan threshold for failure (UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL)"
         default: "HIGH,CRITICAL"
         required: false
         type: string
       trivy_ignore_unfixed:
         description: "Ignore unfixed CVEs in Trivy scan"
+        default: true
+        required: false
+        type: boolean
+      trivy_full_scan:
+        description: "Adds another Trivy scan without threshold"
         default: true
         required: false
         type: boolean
@@ -71,27 +76,26 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
 
-      - name: Generate Trivy sarif report
-        if: ${{ inputs.trivy_upload_sarif }}
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ steps.metadata.outputs.tags }}
-          exit-code: 0
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          ignore-unfixed: ${{ inputs.trivy_ignore_unfixed }}
+      - name: Install Trivy
+        run: |
+          VERSION=${{ inputs.trivy_version }}
+          curl -sSL -o ./trivy.tar.gz https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-64bit.tar.gz
+          tar -xvf trivy.tar.gz
+          mv trivy /usr/local/bin/trivy
+
+      - name: Generate Trivy sarif report for fixable CVEs
+        run: |
+          trivy image ${{ steps.metadata.outputs.tags }} ${{ !inputs.trivy_ignore_unfixed && '--ignore-unfixed' || '' }} --format sarif --vuln-type os,library --severity ${{ inputs.trivy_threshold }} --output trivy-results.sarif
 
       - name: Upload Trivy sarif report
-        if:  ${{ inputs.trivy_upload_sarif }} && ( success() || failure() )
+        if: success() || failure()
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
 
-      - name: Scan for fixable CVEs with Trivy
+      - name: Full scan with Trivy
+        if: ${{ inputs.trivy_full_scan }}
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ steps.metadata.outputs.tags }}
-          exit-code: 1
-          ignore-unfixed: ${{ inputs.trivy_ignore_unfixed }}
-          severity: ${{ inputs.trivy_treshold }}
-
+          exit-code: 0
