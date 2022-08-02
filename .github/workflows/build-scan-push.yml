@@ -36,9 +36,9 @@ on:
 
 jobs:
 
-  build-push-scan:
+  build-scan-push:
 
-    name: Build push & scan Dockerfile
+    name: Build, scan & push Dockerfile
     runs-on: ubuntu-latest
     permissions:
       checks: write
