@@ -1,0 +1,44 @@
+---
+name: Test with Gradle
+
+# Make the workflow re-usable
+on:
+  workflow_call:
+    inputs:
+      test_command:
+        description: "Command to execute for the tests"
+        default: "./gradlew test"
+        required: false
+        type: string
+      publish_results:
+        description: "Creates a comment on the PR with the test results"
+        default: true
+        required: false
+        type: boolean
+
+jobs:
+
+  test:
+
+    name: Gradle Tests
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+
+    steps:
+
+      # Git Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Gradle Unit Tests
+        run: ${{ inputs.test_command }}
+
+      # Publishes the test results
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        # Runs even if the tests fail
+        if: ${{ inputs.publish_results }} && ( success() || failure() )
+        with:
+          files: "**/TEST-*.xml"
