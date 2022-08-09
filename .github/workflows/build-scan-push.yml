@@ -4,6 +4,10 @@ name: Build, Scan & Push
 # Make the workflow re-usable
 on:
   workflow_call:
+    outputs:
+      image-digest:
+        description: "The digest of the container image being built"
+        value: ${{ jobs.build-scan-push.outputs.image-digest }}
     inputs:
       image_tags:
         description: |
@@ -14,33 +18,31 @@ on:
         required: true
         type: string
       trivy_version:
-        description: "Version of Trivy to use"
-        default: "0.30.4"
+        description: 'Version of Trivy to use'
+        default: '0.30.4'
         required: false
         type: string
       trivy_threshold:
-        description: "Trivy scan threshold for failure (UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL)"
-        default: "HIGH,CRITICAL"
+        description: 'Trivy scan threshold for failure (UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL)'
+        default: 'HIGH,CRITICAL'
         required: false
         type: string
       trivy_ignore_unfixed:
-        description: "Ignore unfixed CVEs in Trivy scan"
+        description: 'Ignore unfixed CVEs in Trivy scan'
         default: true
         required: false
         type: boolean
       trivy_full_scan:
-        description: "Adds another Trivy scan without threshold"
+        description: 'Adds another Trivy scan without threshold'
         default: true
         required: false
         type: boolean
 
 jobs:
-
   build-scan-push:
-
     name: Build, scan & push Dockerfile
     runs-on: ubuntu-latest
-    outputs: 
+    outputs:
       image-digest: ${{ steps.docker_build_push.outputs.digest }}
     permissions:
       checks: write
@@ -49,7 +51,6 @@ jobs:
       security-events: write
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v3
 
