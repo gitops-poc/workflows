@@ -40,6 +40,8 @@ jobs:
 
     name: Build, scan & push Dockerfile
     runs-on: ubuntu-latest
+    outputs: 
+      image-digest: ${{ steps.docker_build_push.outputs.digest }}
     permissions:
       checks: write
       pull-requests: write
@@ -69,6 +71,7 @@ jobs:
           tags: ${{ inputs.image_tags }}
 
       - name: Build & Push
+        id: docker_build_push
         uses: docker/build-push-action@v3
         with:
           context: .
